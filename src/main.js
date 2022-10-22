@@ -55,12 +55,12 @@ const cardNumberPatter = {
     mask: [
         {
             mask: "0000 0000 0000 0000",
-            RegExp: /^4\d{0-15}/,
+            regex: /^4\d{0,15}/,
             cardtype: "visa",
         },
         {
             mask: "0000 0000 0000 0000",
-            RegExp: /(^5[1-5]\d{0-2}|^22[2-9]\d|^2[3-7]\d{0-2})\d{0-12}/,
+            regex: /(^5[1-5]\d{0-2}|^22[2-9]\d|^2[3-7]\d{0-2})\d{0-12}/,
             cardtype: "mastercard",
         },
         {
@@ -68,9 +68,38 @@ const cardNumberPatter = {
             cardtype: "default",
         },
     ],
-    dispatch: function(appended, dynamicMasked) {
-        var number = (dynamicMasked.value + appended).replace("/\D/g,g");
+    dispatch: function (appended, dynamicMasked) {
+        var number = (dynamicMasked.value + appended).replace(/\D/g,"")
+        const foundMask = dynamicMasked.compiledMasks.find(({regex}) =>number.match(regex))
+
+        console.log(foundMask)
+        return foundMask
         
-    }
+    },
 
 }
+const cardNumberMasked = IMask(cardNumber, cardNumberPatter)
+
+
+//Manipulando eventos na DOM
+
+const addButton = document.querySelector("#add-card")
+addButton.addEventListener("click", () =>{
+    alert("Cartão adicionado!")
+})
+
+document.querySelector("form").addEventListener("submit", (event)=>{
+    //não recarregar a pagina ao clicar no button
+    event.preventDefault()
+})
+
+//Escrevendo o nome no cartão em tempo real(quando escreve no input)
+const cardHolder = document.querySelector("#card-holder")
+cardHolder.addEventListener("input", ()=> {
+    const ccHolder = document.querySelector(".cc-holder .value")
+    //if ternario
+    ccHolder.innerText = cardHolder.value.length === 0 ? "FULANO DA SILVA" : cardHolder.value
+    
+})
+
+
